@@ -3,9 +3,9 @@ package com.bankingApp.authService.controller;
 import com.bankingApp.authService.dto.LoginRequest;
 import com.bankingApp.authService.dto.SignupRequest;
 import com.bankingApp.authService.model.Role;
-import com.bankingApp.authService.model.User;
+import com.bankingApp.authService.model.Staff;
 import com.bankingApp.authService.repository.RoleRepository;
-import com.bankingApp.authService.repository.UserRepository;
+import com.bankingApp.authService.repository.StaffRepository;
 import com.bankingApp.authService.service.UserDetailsImpl;
 import com.bankingApp.authService.utils.JwtUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -25,12 +25,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/staff")
 @Slf4j
-public class UserController {
+public class StaffController {
 
     @Autowired
-    private UserRepository userRepository;
+    private StaffRepository staffRepository;
 
     @Autowired
     private RoleRepository roleRepository;
@@ -50,23 +50,23 @@ public class UserController {
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody SignupRequest request) {
 
-        if (userRepository.existsByUsername(request.getUsername())) {
+        if (staffRepository.existsByUsername(request.getUsername())) {
             throw new RuntimeException("User already exists");
         }
 
         Role role = roleRepository.findByName(request.getRole())
                 .orElseThrow(() -> new RuntimeException("Role not found"));
 
-        User user = new User();
-        user.setUsername(request.getUsername());
-        user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole(request.getRole());        // store role name
-        user.setRoleEntity(role);               // store FK role_id
+        Staff staff = new Staff();
+        staff.setUsername(request.getUsername());
+        staff.setEmail(request.getEmail());
+        staff.setPassword(passwordEncoder.encode(request.getPassword()));
+        staff.setRole(request.getRole());
+        staff.setRoleEntity(role);
 
-        user = userRepository.save(user);
+        staff = staffRepository.save(staff);
 
-        Set<GrantedAuthority> authorities = user.getRoleEntity().getPermissions()
+        Set<GrantedAuthority> authorities = staff.getRoleEntity().getPermissions()
                 .stream()
                 .map(p -> new SimpleGrantedAuthority(p.getName()))
                 .collect(Collectors.toSet());
@@ -74,7 +74,7 @@ public class UserController {
         // Print each authority
         authorities.forEach(auth -> System.out.println(auth.getAuthority()));
 
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(staff);
     }
 
     @PostMapping("/login")
@@ -92,8 +92,8 @@ public class UserController {
     }
 
     @GetMapping
-    public List<User> listUsers() {
-        return userRepository.findAll();
+    public List<Staff> listUsers() {
+        return staffRepository.findAll();
     }
 
 }

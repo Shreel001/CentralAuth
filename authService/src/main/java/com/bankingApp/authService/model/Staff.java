@@ -7,10 +7,10 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Entity
-@Table(name = "customers")
-@Inheritance(strategy = InheritanceType.JOINED)
+@Table(name = "staff")
 @Data
-public class User {
+public class Staff{
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -30,5 +30,6 @@ public class User {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id", nullable = false)
-    private Role roleEntity;
+    private Role roleEntity; // maps to roles.id
+
 }

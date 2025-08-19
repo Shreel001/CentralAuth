@@ -4,12 +4,12 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtUtils {
@@ -39,12 +39,24 @@ public class JwtUtils {
         return claims.getSubject();
     }
 
-    public String generateToken(String username){
+    public String generateToken(String username, Collection<? extends GrantedAuthority> authorities){
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, username);
+
+        Set<String> roles = authorities.stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toSet());
+
+        // Print each authority
+        System.out.println("Printing roles");
+        roles.forEach(auth -> System.out.println(auth));
+
+        return createToken(claims, username, roles);
     }
 
-    private String createToken(Map<String, Object> claims, String subject){
+
+    private String createToken(Map<String, Object> claims, String subject, Set<String> authorities){
+        claims.put("authorities", authorities);
+
         return Jwts.builder()
                 .claims(claims)
                 .subject(subject)

@@ -1,7 +1,7 @@
 package com.bankingApp.authService.configuration;
 
 import com.bankingApp.authService.filter.JwtFilter;
-import com.bankingApp.authService.service.CustomUserDetailsService;
+import com.bankingApp.authService.service.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,7 +25,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SpringSecurity {
 
     @Autowired
-    private CustomUserDetailsService customUserDetailsService;
+    private UserDetailsImpl userDetailsImpl;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -41,7 +41,7 @@ public class SpringSecurity {
                 .csrf((csrf) -> csrf.disable())
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/users/signup", "/users/login", "/register.html").permitAll()
+                        .requestMatchers("/users/signup", "/users/login", "/register.html", "/staff/signup", "/staff/login").permitAll()
                         .requestMatchers("/users/**").authenticated()
                         .anyRequest().permitAll()
                 )
@@ -58,7 +58,7 @@ public class SpringSecurity {
 
     public AuthenticationProvider authenticationProvider(){
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(customUserDetailsService);
+        authProvider.setUserDetailsService(userDetailsImpl);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
