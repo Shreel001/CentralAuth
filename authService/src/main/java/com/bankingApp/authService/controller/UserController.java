@@ -20,7 +20,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -71,23 +73,21 @@ public class UserController {
                 .map(p -> new SimpleGrantedAuthority(p.getName()))
                 .collect(Collectors.toSet());
 
-        // Print each authority
-        authorities.forEach(auth -> System.out.println(auth.getAuthority()));
-
         return ResponseEntity.ok(user);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequest request){
-
+    public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest request){
+        Map<String, String> response = new HashMap<>();
         try{
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
             UserDetails userDetails = userDetailsImpl.loadUserByUsername(request.getUsername());
             String jwt = jwtUtils.generateToken(userDetails.getUsername(), userDetails.getAuthorities());
-            return ResponseEntity.ok(jwt);
+            response.put("token",jwt);
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("Exception occured while creating Authentication token ", e );
-            return new ResponseEntity<>("Incorrect username and password", HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
     }
 
