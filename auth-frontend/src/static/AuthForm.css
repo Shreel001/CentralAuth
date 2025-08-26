@@ -5,7 +5,7 @@
 
 body {
   margin: 0;
-  background: #1f1f1f;
+  background: #ffffff;
   height: 100vh;
   display: flex;
   justify-content: center;
@@ -15,16 +15,19 @@ body {
 /* Container */
 .auth-container {
   display: flex;
-  height: 85vh;
-  width: 85vw;
+  height: 75vh;
+  width: 75vw;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 /* Left Image */
 .auth-image {
   width: 50%;
   overflow: hidden;
+}
+
+#left-container{
+  border-right: 1px solid #303030 ;
 }
 
 .auth-image img {
@@ -39,8 +42,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #3859b3;
-  padding: 40px;
+  background-color: #ffffff;
+  padding: 10px;
 }
 
 .auth-card {
@@ -49,7 +52,6 @@ body {
   background: #fefeff;
   padding: 40px 30px;
   border-radius: 10px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   text-align: center;
 }
 
@@ -70,7 +72,7 @@ body {
 .auth-form input {
   width: 100%;
   padding: 12px 15px;
-  border: 1px solid #ccc;
+  border: 2px solid #ccc;
   border-radius: 5px;
   font-size: 15px;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
@@ -80,7 +82,7 @@ body {
 .auth-form select {
   width: 100%;
   padding: 12px 15px;
-  border: 1px solid #ccc;
+  border: 2px solid #ccc;
   border-radius: 5px;
   font-size: 15px;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;

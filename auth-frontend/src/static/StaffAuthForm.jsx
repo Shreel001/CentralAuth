@@ -1,5 +1,7 @@
 import { useState } from "react";
-import "../AuthForm.css";
+import "./AuthForm.css";
+import { useNavigate } from "react-router-dom";
+
 
 export default function StaffAuthForm() {
   const [isLogin, setIsLogin] = useState(true);
@@ -8,6 +10,7 @@ export default function StaffAuthForm() {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("");
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -34,6 +37,9 @@ export default function StaffAuthForm() {
 
       const data = await response.json();
       if (isLogin) localStorage.setItem("token", data.token);
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data));
+        navigate("/dashboard");
       setMessage(isLogin ? "Login successful!" : "Signup successful!");
     } catch (err) {
       setMessage("Error: " + err.message);
@@ -42,7 +48,7 @@ export default function StaffAuthForm() {
 
   return (
     <div className="auth-container">
-      <div className="auth-form-container">
+      <div className="auth-form-container" id="left-container">
         <div className="auth-card">
           <div className="toggle-btns">
             <button

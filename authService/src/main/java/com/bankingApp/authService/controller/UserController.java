@@ -2,6 +2,7 @@ package com.bankingApp.authService.controller;
 
 import com.bankingApp.authService.dto.LoginRequest;
 import com.bankingApp.authService.dto.SignupRequest;
+import com.bankingApp.authService.dto.UserData;
 import com.bankingApp.authService.model.Role;
 import com.bankingApp.authService.model.User;
 import com.bankingApp.authService.repository.RoleRepository;
@@ -20,10 +21,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -48,6 +46,9 @@ public class UserController {
 
     @Autowired
     private JwtUtils jwtUtils;
+
+    @Autowired
+    private UserData userData;
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody SignupRequest request) {
@@ -77,13 +78,15 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest request){
-        Map<String, String> response = new HashMap<>();
+    public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequest request){
+        Map<String, Object> response = new HashMap<>();
         try{
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
+            userData.userData(request.getUsername());
             UserDetails userDetails = userDetailsImpl.loadUserByUsername(request.getUsername());
             String jwt = jwtUtils.generateToken(userDetails.getUsername(), userDetails.getAuthorities());
             response.put("token",jwt);
+            response.put("user", userRepository.findByUsername(request.getUsername()));
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("Exception occured while creating Authentication token ", e );
@@ -94,6 +97,11 @@ public class UserController {
     @GetMapping
     public List<User> listUsers() {
         return userRepository.findAll();
+    }
+
+    @GetMapping("/{username}")
+    public Optional<User> getUser(@PathVariable String username) {
+        return userRepository.findByUsername(username);
     }
 
 }

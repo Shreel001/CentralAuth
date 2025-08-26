@@ -46,10 +46,6 @@ public class JwtUtils {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toSet());
 
-        // Print each authority
-        System.out.println("Printing roles");
-        roles.forEach(auth -> System.out.println(auth));
-
         return createToken(claims, username, roles);
     }
 

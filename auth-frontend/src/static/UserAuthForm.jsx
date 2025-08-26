@@ -1,5 +1,6 @@
 import { useState } from "react";
-import "../AuthForm.css";
+import "./AuthForm.css";
+import { useNavigate } from "react-router-dom";
 
 export default function UserAuthForm() {
   const [isLogin, setIsLogin] = useState(true);
@@ -8,6 +9,8 @@ export default function UserAuthForm() {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("");
   const [message, setMessage] = useState("");
+  
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -33,7 +36,11 @@ export default function UserAuthForm() {
       }
 
       const data = await response.json();
-      if (isLogin) localStorage.setItem("token", data.token);
+      if (isLogin) {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data));
+        navigate("/dashboard");
+      }
       setMessage(isLogin ? "Login successful!" : "Signup successful!");
     } catch (err) {
       setMessage("Error: " + err.message);
@@ -43,12 +50,14 @@ export default function UserAuthForm() {
   return (
     <div className="auth-container">
       {/* Left Side - Image */}
-      <div className="auth-image">
+      <div className="auth-image" id="left-container">
         <img
           src="https://img.freepik.com/premium-vector/bank-transfer-isolated-cartoon-vector-illustrations_107173-21789.jpg"
           alt="Library"
         />
       </div>
+
+      {/* Right Side - Auth container */}
       <div className="auth-form-container">
         <div className="auth-card">
           <div className="toggle-btns">

@@ -29,11 +29,6 @@ public class SpringSecurity {
     @Autowired
     private UserDetailsImpl userDetailsImpl;
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
     @Autowired
     private JwtFilter jwtFilter;
 
@@ -51,6 +46,11 @@ public class SpringSecurity {
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
     @Bean

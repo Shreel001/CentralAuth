@@ -77,13 +77,14 @@ public class StaffController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest request){
-        Map<String, String> response = new HashMap<>();
+    public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequest request){
+        Map<String, Object> response = new HashMap<>();
         try{
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
             UserDetails userDetails = userDetailsImpl.loadUserByUsername(request.getUsername());
             String jwt = jwtUtils.generateToken(userDetails.getUsername(), userDetails.getAuthorities());
             response.put("token", jwt);
+            response.put("user", userDetails);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("Exception occured while creating Authentication token ", e );
