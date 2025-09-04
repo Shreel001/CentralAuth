@@ -9,4 +9,7 @@ import lombok.Data;
 @Entity
 @Table(name = "staff")
 @Data
-public class Staff extends BaseUser{ }
+public class Staff extends BaseUser{
+    @Column(nullable = false)
+    private Long branchCode;
+}

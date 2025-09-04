@@ -3,8 +3,6 @@ package com.banking.accountService.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.List;
-
 @Entity
 @Table(name="bank_account")
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -17,15 +15,18 @@ public class BankAccount  {
     @Column(unique = true, nullable = false)
     private String accountNumber;
 
+    @Column(nullable = false)
+    private Long userId; // Link to User in auth service (foreign key or via API)
+
     @Enumerated(EnumType.STRING)
     private AccountType account_type;   // CHECKING, SAVINGS, LOAN
 
     private Double balance;
 
-    @Column(nullable = false)
-    private Long userId; // Link to User in auth service (foreign key or via API)
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
-    @OneToMany(mappedBy = "bankAccount", cascade = CascadeType.ALL)
-    private List<TransactionType> transactions;
+    @Column(nullable = false)
+    private Long branchCode;
 
 }
