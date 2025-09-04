@@ -1,4 +1,32 @@
 package com.bankingApp.authService.model;
 
-public class BaseUser {
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.Data;
+
+@MappedSuperclass
+@Data
+public abstract class BaseUser {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @NotBlank(message = "Name is required")
+    private String username;
+
+    @Email(message = "Invalid email")
+    @NotBlank(message = "Email is required")
+    private String email;
+
+    @Size(min = 8, message = "Password must be at least 8 characters")
+    private String password;
+
+    @Column(nullable = false)
+    private String role; // role name for convenience
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "role_id", nullable = false)
+    private Role roleEntity;
 }

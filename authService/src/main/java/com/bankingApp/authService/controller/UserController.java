@@ -2,10 +2,11 @@ package com.bankingApp.authService.controller;
 
 import com.bankingApp.authService.dto.LoginRequest;
 import com.bankingApp.authService.dto.SignupRequest;
-import com.bankingApp.authService.dto.UserData;
 import com.bankingApp.authService.model.Role;
+import com.bankingApp.authService.model.Staff;
 import com.bankingApp.authService.model.User;
 import com.bankingApp.authService.repository.RoleRepository;
+import com.bankingApp.authService.repository.StaffRepository;
 import com.bankingApp.authService.repository.UserRepository;
 import com.bankingApp.authService.service.UserDetailsImpl;
 import com.bankingApp.authService.utils.JwtUtils;
@@ -25,12 +26,15 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/auth")
 @Slf4j
 public class UserController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private StaffRepository staffRepository;
 
     @Autowired
     private RoleRepository roleRepository;
@@ -47,11 +51,8 @@ public class UserController {
     @Autowired
     private JwtUtils jwtUtils;
 
-    @Autowired
-    private UserData userData;
-
-    @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody SignupRequest request) {
+    @PostMapping("/user/signup")
+    public ResponseEntity<?> userSignup(@RequestBody SignupRequest request) {
 
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new RuntimeException("User already exists");
@@ -77,16 +78,66 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequest request){
+    @PostMapping("/user/login")
+    public ResponseEntity<Map<String, Object>> userLogin(@RequestBody LoginRequest request){
         Map<String, Object> response = new HashMap<>();
         try{
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
-            userData.userData(request.getUsername());
+            Optional<User> userData = userRepository.findByUsername(request.getUsername());
             UserDetails userDetails = userDetailsImpl.loadUserByUsername(request.getUsername());
             String jwt = jwtUtils.generateToken(userDetails.getUsername(), userDetails.getAuthorities());
+
+            response.put("username", userData.get().getUsername());
+            response.put("email", userData.get().getEmail());
+            response.put("role", userData.get().getRole());
             response.put("token",jwt);
-            response.put("user", userRepository.findByUsername(request.getUsername()));
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Exception occured while creating Authentication token ", e );
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+    }
+
+    @PostMapping("/staff/signup")
+    public ResponseEntity<?> staffSignup(@RequestBody SignupRequest request) {
+
+        if (staffRepository.existsByUsername(request.getUsername())) {
+            throw new RuntimeException("User already exists");
+        }
+
+        Role role = roleRepository.findByName(request.getRole())
+                .orElseThrow(() -> new RuntimeException("Role not found"));
+
+        Staff staff = new Staff();
+        staff.setUsername(request.getUsername());
+        staff.setEmail(request.getEmail());
+        staff.setPassword(passwordEncoder.encode(request.getPassword()));
+        staff.setRole(request.getRole());
+        staff.setRoleEntity(role);
+
+        staff = staffRepository.save(staff);
+
+        Set<GrantedAuthority> authorities = staff.getRoleEntity().getPermissions()
+                .stream()
+                .map(p -> new SimpleGrantedAuthority(p.getName()))
+                .collect(Collectors.toSet());
+
+        return ResponseEntity.ok(staff);
+    }
+
+    @PostMapping("/staff/login")
+    public ResponseEntity<Map<String, Object>> staffLogin(@RequestBody LoginRequest request){
+        Map<String, Object> response = new HashMap<>();
+        try{
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
+            UserDetails userDetails = userDetailsImpl.loadUserByUsername(request.getUsername());
+            Optional<Staff> userData = staffRepository.findByUsername(request.getUsername());
+            String jwt = jwtUtils.generateToken(userDetails.getUsername(), userDetails.getAuthorities());
+
+            response.put("username", userData.get().getUsername());
+            response.put("email",userData.get().getEmail());
+            response.put("role", userData.get().getRole());
+            response.put("token", jwt);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("Exception occured while creating Authentication token ", e );

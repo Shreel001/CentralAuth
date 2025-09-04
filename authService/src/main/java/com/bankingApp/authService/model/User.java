@@ -10,25 +10,4 @@ import lombok.Data;
 @Table(name = "customers")
 @Inheritance(strategy = InheritanceType.JOINED)
 @Data
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @NotBlank(message = "Name is required")
-    private String username;
-
-    @Email(message = "Invalid email")
-    @NotBlank(message = "Email is required")
-    private String email;
-
-    @Size(min = 8, message = "Password must be at least 8 characters")
-    private String password;
-
-    @Column(nullable = false)
-    private String role; // role name for convenience
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "role_id", nullable = false)
-    private Role roleEntity;
-}
+public class User extends BaseUser{ }

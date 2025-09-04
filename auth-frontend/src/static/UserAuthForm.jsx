@@ -15,8 +15,8 @@ export default function UserAuthForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const url = isLogin
-      ? "http://localhost:8080/users/login"
-      : "http://localhost:8080/users/signup";
+      ? "http://localhost:8080/auth/user/login"
+      : "http://localhost:8080/auth/user/signup";
 
     const body = isLogin
       ? { username, password }

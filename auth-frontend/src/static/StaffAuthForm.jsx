@@ -15,8 +15,8 @@ export default function StaffAuthForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const url = isLogin
-      ? "http://localhost:8080/staff/login"
-      : "http://localhost:8080/staff/signup";
+      ? "http://localhost:8080/auth/staff/login"
+      : "http://localhost:8080/auth/staff/signup";
 
     const body = isLogin
       ? { username, password }
